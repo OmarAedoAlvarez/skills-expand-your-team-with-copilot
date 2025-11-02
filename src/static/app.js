@@ -828,6 +828,15 @@ document.addEventListener("DOMContentLoaded", () => {
     );
   }
 
+  // Helper function to show visual feedback on copy button
+  function showCopyFeedback(button) {
+    const originalIcon = button.querySelector('.share-icon').textContent;
+    button.querySelector('.share-icon').textContent = '✓';
+    setTimeout(() => {
+      button.querySelector('.share-icon').textContent = originalIcon;
+    }, 2000);
+  }
+
   // Handle social sharing
   function handleShare(event) {
     const button = event.currentTarget;
@@ -866,18 +875,13 @@ document.addEventListener("DOMContentLoaded", () => {
       if (navigator.clipboard && navigator.clipboard.writeText) {
         navigator.clipboard.writeText(textToCopy).then(() => {
           showMessage("Link copied to clipboard!", "success");
-          // Visual feedback on button
-          const originalIcon = button.querySelector('.share-icon').textContent;
-          button.querySelector('.share-icon').textContent = '✓';
-          setTimeout(() => {
-            button.querySelector('.share-icon').textContent = originalIcon;
-          }, 2000);
+          showCopyFeedback(button);
         }).catch((err) => {
           console.error('Failed to copy text: ', err);
           showMessage("Failed to copy link. Please try again.", "error");
         });
       } else {
-        // Fallback for older browsers
+        // Fallback for older browsers using deprecated execCommand for backward compatibility
         const textArea = document.createElement("textarea");
         textArea.value = textToCopy;
         textArea.style.position = "fixed";
@@ -885,14 +889,9 @@ document.addEventListener("DOMContentLoaded", () => {
         document.body.appendChild(textArea);
         textArea.select();
         try {
-          document.execCommand('copy');
+          document.execCommand('copy'); // Deprecated but needed for older browser support
           showMessage("Link copied to clipboard!", "success");
-          // Visual feedback on button
-          const originalIcon = button.querySelector('.share-icon').textContent;
-          button.querySelector('.share-icon').textContent = '✓';
-          setTimeout(() => {
-            button.querySelector('.share-icon').textContent = originalIcon;
-          }, 2000);
+          showCopyFeedback(button);
         } catch (err) {
           console.error('Failed to copy text: ', err);
           showMessage("Failed to copy link. Please try again.", "error");
